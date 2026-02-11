@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,13 +53,15 @@ public class Account {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = Instant.now();
+		this.updatedAt = Instant.now();
 		if (balance == null) {
 			this.balance = BigDecimal.ZERO;
 		}
 	}
 
-	@PrePersist
+	@PreUpdate
 	protected void onUpdate() {
 		this.updatedAt = Instant.now();
 	}
+
 }

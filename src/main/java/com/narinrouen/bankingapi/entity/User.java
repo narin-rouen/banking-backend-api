@@ -41,30 +41,31 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private String status;
+	private UserStatus status;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private String role;
+	private Role role;
 
 	@OneToMany(mappedBy = "user")
 	private List<Account> accounts;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createAt;
+	private Instant createdAt;
 
 	@Column(name = "updated_at", nullable = false)
-	private Instant updateAt;
+	private Instant updatedAt;
 
 	@PrePersist
 	protected void onCreate() {
-		createAt = Instant.now();
-		updateAt = Instant.now();
+		createdAt = Instant.now();
+		updatedAt = Instant.now();
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
-		updateAt = Instant.now();
+		updatedAt = Instant.now();
 	}
 }
