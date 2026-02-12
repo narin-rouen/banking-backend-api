@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "sessions")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Session {
 
 	@Id
@@ -34,6 +36,9 @@ public class Session {
 	@Column(nullable = false, length = 500)
 	private String token;
 
+	@Column(name = "refresh_token", length = 500)
+	private String refreshToken;
+
 	@Column(name = "is_active", nullable = false)
 	private boolean isActive;
 
@@ -42,6 +47,15 @@ public class Session {
 
 	@Column(name = "expires_at", nullable = false)
 	private Instant expiresAt;
+
+	@Column(name = "refresh_expires_at")
+	private Instant refreshExpiresAt;
+
+	@Column(name = "ip_address")
+	private String ipAddress;
+
+	@Column(name = "user_agent", length = 500)
+	private String userAgent;
 
 	@PrePersist
 	protected void onCreate() {
