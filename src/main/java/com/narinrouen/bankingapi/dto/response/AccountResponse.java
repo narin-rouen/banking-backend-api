@@ -1,9 +1,8 @@
-package com.narinrouen.bankingapi.dto.response.account;
+package com.narinrouen.bankingapi.dto.response;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import com.narinrouen.bankingapi.dto.response.user.UserSummaryResponse;
 import com.narinrouen.bankingapi.entity.Account;
 
 public record AccountResponse(

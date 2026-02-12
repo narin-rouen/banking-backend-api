@@ -1,4 +1,4 @@
-package com.narinrouen.bankingapi.dto.response.account;
+package com.narinrouen.bankingapi.dto.response;
 
 import java.time.Instant;
 

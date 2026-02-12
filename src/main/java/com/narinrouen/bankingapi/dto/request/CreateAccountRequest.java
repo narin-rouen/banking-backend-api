@@ -1,4 +1,4 @@
-package com.narinrouen.bankingapi.dto.request.account;
+package com.narinrouen.bankingapi.dto.request;
 
 import java.math.BigDecimal;
 

@@ -1,7 +1,6 @@
-package com.narinrouen.bankingapi.dto.response.auth;
+package com.narinrouen.bankingapi.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.narinrouen.bankingapi.dto.response.user.UserSummaryResponse;
 
 public record AuthResponse(
 

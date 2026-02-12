@@ -1,4 +1,4 @@
-package com.narinrouen.bankingapi.dto.response.user;
+package com.narinrouen.bankingapi.dto.response;
 
 import com.narinrouen.bankingapi.entity.Role;
 import com.narinrouen.bankingapi.entity.User;

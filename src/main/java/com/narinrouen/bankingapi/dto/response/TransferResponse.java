@@ -1,4 +1,4 @@
-package com.narinrouen.bankingapi.dto.response.transfer;
+package com.narinrouen.bankingapi.dto.response;
 
 import java.math.BigDecimal;
 import java.time.Instant;
