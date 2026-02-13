@@ -8,7 +8,9 @@ import com.narinrouen.bankingapi.dto.request.LoginRequest;
 import com.narinrouen.bankingapi.dto.request.RegisterRequest;
 import com.narinrouen.bankingapi.dto.response.AuthResponse;
 import com.narinrouen.bankingapi.dto.response.UserSummaryResponse;
+import com.narinrouen.bankingapi.entity.Role;
 import com.narinrouen.bankingapi.entity.User;
+import com.narinrouen.bankingapi.entity.UserStatus;
 import com.narinrouen.bankingapi.repository.SessionRepository;
 import com.narinrouen.bankingapi.repository.UserRepository;
 
@@ -77,9 +79,18 @@ public class AuthService {
 			throw new RuntimeException("Email already in use");
 		}
 
+		// check if role is provided and valid, otherwise default to USER
+		Role role = Role.USER; // default
+		if (request.role() != null && !request.role().isEmpty()) {
+			try {
+				role = Role.valueOf(request.role().toUpperCase());
+			} catch (IllegalArgumentException e) {
+				log.warn("Invalid role provided: {}, using default USER", request.role());
+			}
+		}
+
 		User user = User.builder().email(request.email()).password(passwordEncoder.encode(request.password()))
-				.firstName(request.firstName()) // Changed from .name(request.email())
-				.lastName(request.lastName()) // Added lastName
+				.firstName(request.firstName()).lastName(request.lastName()).role(role).status(UserStatus.ACTIVE)
 				.build();
 
 		User savedUser = userRepository.save(user);
@@ -88,4 +99,5 @@ public class AuthService {
 
 		return UserSummaryResponse.from(savedUser);
 	}
+
 }

@@ -65,4 +65,5 @@ public class AuthController {
 	public ResponseEntity<?> getActiveSessions(@RequestParam Long userId) {
 		return ResponseEntity.ok(sessionService.getUserActiveSessions(userId));
 	}
+
 }

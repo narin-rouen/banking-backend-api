@@ -3,11 +3,13 @@ package com.narinrouen.bankingapi.service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.narinrouen.bankingapi.dto.response.SessionResponse;
 import com.narinrouen.bankingapi.entity.Session;
 import com.narinrouen.bankingapi.entity.User;
 import com.narinrouen.bankingapi.repository.SessionRepository;
@@ -93,8 +95,9 @@ public class SessionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Session> getUserActiveSessions(Long userId) {
-		return sessionRepository.findByUserIdAndIsActiveTrue(userId);
+	public List<SessionResponse> getUserActiveSessions(Long userId) {
+		return sessionRepository.findByUserIdAndIsActiveTrue(userId).stream().map(SessionResponse::from)
+				.collect(Collectors.toList());
 	}
 
 	private String getClientIp(HttpServletRequest request) {

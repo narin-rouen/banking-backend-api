@@ -49,7 +49,8 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private Role role;
+	@Builder.Default
+	private Role role = Role.USER;
 
 	@OneToMany(mappedBy = "user")
 	private List<Account> accounts;
