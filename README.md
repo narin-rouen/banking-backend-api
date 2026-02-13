@@ -1,6 +1,6 @@
 # 💳 Digital Bank Management API
 
-A production-ready RESTful Banking Backend built with Spring Boot that supports secure authentication, role-based authorization, and real-time financial transactions including deposits, withdrawals, and transfers.
+A production-ready RESTful Banking Backend built with Spring Boot that supports secure authentication, role-based authorization, and real-time financial transactions, including deposits, withdrawals, and transfers.
 
 This project demonstrates clean architecture, security best practices, and scalable backend design.
 
@@ -219,7 +219,5 @@ Focused on building secure, scalable backend systems with production-ready stand
 
 ## 📄 License
 
-All rights reserved. This is my personal project showing my skills. Please DO NOT copy or reuse any of these code. THANKS 🙏
+All rights reserved. This is my personal project showing my skills. Please DO NOT copy or reuse any of this code. THANKS 🙏
 
-```
-```
