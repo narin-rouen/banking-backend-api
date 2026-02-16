@@ -27,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AccountService {
 
-	private AccountRepository accountRepository;
-	private UserRepository userRepository;
+	private final AccountRepository accountRepository;
+	private final UserRepository userRepository;
 
 	@Transactional(readOnly = true)
 	public PaginatedAccountResponse getAllAccounts(PageRequest pageRequest) {

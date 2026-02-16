@@ -19,7 +19,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
 	List<Session> findByUserIdAndIsActiveTrue(Long userId);
 
-	@Query("SELECT s FROM Session s WHERE s.token = :token AND s.isActive = true AND s.expiresAt > :now")
+	@Query("SELECT s FROM Session s JOIN FETCH s.user WHERE s.token = :token AND s.isActive = true AND s.expiresAt > :now")
 	Optional<Session> findValidSessionByToken(@Param("token") String token, @Param("now") Instant now);
 
 	@Query("SELECT s FROM Session s WHERE s.refreshToken = :refreshToken AND s.isActive = true AND s.refreshExpiresAt > :now")

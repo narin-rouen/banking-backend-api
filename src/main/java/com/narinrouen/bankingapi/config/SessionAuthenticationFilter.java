@@ -35,12 +35,12 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
 
 		final String authHeader = request.getHeader("Authorization");
 
-		if (authHeader == null || !authHeader.startsWith("Session ")) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		final String token = authHeader.substring(8);
+		final String token = authHeader.substring(7);
 
 		try {
 			var sessionOptinal = sessionService.validateSession(token);
@@ -49,6 +49,9 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
 				var user = session.getUser();
 
 				UserDetails userDetails = new SecurityUser(user);
+
+				log.debug("User authorities: {}", userDetails.getAuthorities());
+				log.debug("User role: {}", user.getRole());
 
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
 						null, userDetails.getAuthorities());
