@@ -5,17 +5,10 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
-public record DepositRequest(
-
-		@NotNull(message = "Account ID is required") Long accountId,
+public record WithdrawRequest(@NotNull(message = "Account ID is required") Long accountId,
 
 		@NotNull(message = "Amount is required") @DecimalMin(value = "0.01", message = "Amount must be greater than zero") BigDecimal amount,
 
 		String reference) {
 
-	public DepositRequest {
-		if (reference != null && reference.trim().isEmpty()) {
-			reference = null; // Convert empty strings to null
-		}
-	}
 }

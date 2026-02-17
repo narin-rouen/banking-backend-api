@@ -1,5 +1,7 @@
 package com.narinrouen.bankingapi.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,9 @@ import com.narinrouen.bankingapi.entity.Account;
 import com.narinrouen.bankingapi.entity.AccountStatus;
 import com.narinrouen.bankingapi.entity.AccountType;
 import com.narinrouen.bankingapi.entity.User;
+import com.narinrouen.bankingapi.exception.InvalidAccountException;
 import com.narinrouen.bankingapi.exception.InvalidAccountTypeException;
+import com.narinrouen.bankingapi.exception.ResourceNotFoundException;
 import com.narinrouen.bankingapi.repository.AccountRepository;
 import com.narinrouen.bankingapi.repository.UserRepository;
 
@@ -50,7 +54,7 @@ public class AccountService {
 	public AccountResponse createAccount(CreateAccountRequest request) {
 		log.info("Creating account for userId={}", request.userId());
 		User user = userRepository.findById(request.userId())
-				.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + request.userId()));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.userId()));
 
 		Account account = new Account();
 		account.setUser(user);
@@ -76,7 +80,7 @@ public class AccountService {
 	public AccountResponse getAccountById(long accountId) {
 		log.info("Fetching account with id={}", accountId);
 		Account account = accountRepository.findById(accountId)
-				.orElseThrow(() -> new IllegalArgumentException("Account not found with id: " + accountId));
+				.orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + accountId));
 		return AccountResponse.from(account);
 	}
 
@@ -84,7 +88,7 @@ public class AccountService {
 	public AccountResponse getAccountByIdAndUserId(long accountId, long userId) {
 		log.info("Fetching account with id={} for userId={}", accountId, userId);
 		Account account = accountRepository.findByIdAndUserId(accountId, userId)
-				.orElseThrow(() -> new IllegalArgumentException(
+				.orElseThrow(() -> new ResourceNotFoundException(
 						"Account not found with id: " + accountId + " for user id: " + userId));
 		return AccountResponse.from(account);
 	}
@@ -92,7 +96,7 @@ public class AccountService {
 	public AccountResponse updateAccount(Long accountId, UpdateAccountRequest request) {
 		log.info("Updating account with id={}", accountId);
 		Account account = accountRepository.findById(accountId)
-				.orElseThrow(() -> new IllegalArgumentException("Account not found with id: " + accountId));
+				.orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + accountId));
 
 		if (request.status() != null) {
 			account.setStatus(request.status());
@@ -106,5 +110,17 @@ public class AccountService {
 		log.info("Account with id={} updated successfully", accountId);
 
 		return AccountResponse.from(updatedAccount);
+	}
+
+	public Account findAndValidateAccount(long accountId) {
+		return accountRepository.findById(accountId).orElseThrow(() -> {
+			log.error("Account not found with ID: {}", accountId);
+			return new InvalidAccountException("Account not found with ID: " + accountId);
+		});
+	}
+
+	public void updateAccountBalance(Account account, BigDecimal newBalance) {
+		account.setBalance(newBalance);
+		accountRepository.save(account);
 	}
 }

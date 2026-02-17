@@ -39,6 +39,25 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(InvalidAccountException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidAccountException(InvalidAccountException ex) {
+		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), Instant.now());
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(TransactionFailedException.class)
+	public ResponseEntity<ErrorResponse> handleTransactionFailedException(TransactionFailedException ex) {
+		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
+				Instant.now());
+		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(InsufficientFundsException.class)
+	public ResponseEntity<ErrorResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
+		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), Instant.now());
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
