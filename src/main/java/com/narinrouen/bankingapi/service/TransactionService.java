@@ -2,17 +2,22 @@ package com.narinrouen.bankingapi.service;
 
 import java.math.BigDecimal;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.narinrouen.bankingapi.dto.common.PageRequest;
 import com.narinrouen.bankingapi.dto.request.DepositRequest;
 import com.narinrouen.bankingapi.dto.request.WithdrawRequest;
+import com.narinrouen.bankingapi.dto.response.PaginatedTransactionResponse;
 import com.narinrouen.bankingapi.dto.response.TransactionResponse;
 import com.narinrouen.bankingapi.entity.Account;
 import com.narinrouen.bankingapi.entity.Transaction;
 import com.narinrouen.bankingapi.entity.TransactionStatus;
 import com.narinrouen.bankingapi.entity.TransactionType;
 import com.narinrouen.bankingapi.exception.InsufficientFundsException;
+import com.narinrouen.bankingapi.exception.ResourceNotFoundException;
 import com.narinrouen.bankingapi.exception.TransactionFailedException;
 import com.narinrouen.bankingapi.repository.TransactionRepository;
 
@@ -141,6 +146,44 @@ public class TransactionService {
 		log.debug("Saving transaction for account {}: type={}, amount={}", transaction.getAccount().getId(),
 				transaction.getType(), transaction.getAmount());
 		return transactionRepository.save(transaction);
+	}
+
+	@Transactional(readOnly = true)
+	public PaginatedTransactionResponse getAllTransaction(PageRequest pageRequest) {
+		log.info("Fetching accounts with pagination: page={}, size={}", pageRequest.page(), pageRequest.size());
+		Pageable pagable = pageRequest.toPageable();
+		Page<Transaction> transactionPage = transactionRepository.findAll(pagable);
+
+		return PaginatedTransactionResponse.from(transactionPage);
+	}
+
+	@Transactional(readOnly = true)
+	public PaginatedTransactionResponse getTransactionByAccountId(Long accountId, PageRequest pageRequest) {
+		log.info("Fetching Transactions for accountId={} with pagination: page={}, size={}", accountId,
+				pageRequest.page(), pageRequest.size());
+
+		accountService.findAndValidateAccount(accountId);
+
+		Pageable pagable = pageRequest.toPageable();
+		Page<Transaction> accountPage = transactionRepository.findByAccountId(accountId, pagable);
+		return PaginatedTransactionResponse.from(accountPage);
+	}
+
+	@Transactional(readOnly = true)
+	public TransactionResponse getTransactionById(Long id) {
+		log.info("Fetching transaction with id={}", id);
+		Transaction transaction = transactionRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+		return TransactionResponse.from(transaction);
+	}
+
+	@Transactional(readOnly = true)
+	public TransactionResponse getTransactionByIdAndAccountId(Long id, Long accountId) {
+		log.info("Fetching transaction with id={} for userId={}", id, accountId);
+		Transaction transaction = transactionRepository.findByIdAndAccountId(id, accountId)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"Transaction not found with id: " + id + " for user id: " + accountId));
+		return TransactionResponse.from(transaction);
 	}
 
 }
