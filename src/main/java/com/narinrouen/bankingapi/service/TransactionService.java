@@ -93,8 +93,6 @@ public class TransactionService {
 
 	}
 
-	// transfer logic
-
 	private void validateDepositRequest(DepositRequest request) {
 		transactionValidationService.validateDepositRequest(request);
 
@@ -126,8 +124,8 @@ public class TransactionService {
 		}
 	}
 
-	public void validateSufficientFunds(BigDecimal balanceBefore, BigDecimal withdrawAmount) {
-		if (balanceBefore.compareTo(withdrawAmount) < 0) {
+	public void validateSufficientFunds(BigDecimal balanceBefore, BigDecimal amount) {
+		if (balanceBefore.compareTo(amount) < 0) {
 			throw new InsufficientFundsException("Insufficient funds: available balance is " + balanceBefore);
 		}
 	}
@@ -137,6 +135,12 @@ public class TransactionService {
 		return Transaction.builder().account(account).type(TransactionType.WITHDRAW).amount(request.amount())
 				.balanceBefore(balanceBefore).balanceAfter(balanceAfter).status(TransactionStatus.SUCCESS)
 				.reference(request.reference()).build();
+	}
+
+	public Transaction saveTransaction(Transaction transaction) {
+		log.debug("Saving transaction for account {}: type={}, amount={}", transaction.getAccount().getId(),
+				transaction.getType(), transaction.getAmount());
+		return transactionRepository.save(transaction);
 	}
 
 }
