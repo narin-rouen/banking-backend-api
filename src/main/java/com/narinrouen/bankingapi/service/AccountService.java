@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,5 +128,14 @@ public class AccountService {
 	public Long findAccountIdByuserId(long id) {
 		log.info("User Id = {} fetch account Id");
 		return accountRepository.findAccountIdByUserId(id);
+	}
+
+	public void verifyAccountOwnership(Long accountId, long userId) {
+		Account account = accountRepository.findById(accountId)
+				.orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + accountId));
+
+		if (account.getUser().getId() != userId) {
+			throw new AccessDeniedException("Account does not belong to user");
+		}
 	}
 }

@@ -1,7 +1,6 @@
 package com.narinrouen.bankingapi.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +34,7 @@ public class TransactionController {
 
 	// for admin
 	@GetMapping("/api/admin/transactions")
-	@PreAuthorize("ADMIN")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<PaginatedTransactionResponse> getAllTransactionsForAdmin(
 			@Valid @ModelAttribute PageRequest pageRequest) {
 		if (pageRequest == null) {
@@ -48,7 +47,7 @@ public class TransactionController {
 	}
 
 	@GetMapping("/api/admin/transactions/{id}")
-	@PreAuthorize("ADMIN")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<TransactionResponse> getTransactionById(@PathVariable Long id) {
 		log.info("Admin fect a transaction with the ID: {}", id);
 		return ResponseEntity.ok(transactionService.getTransactionById(id));
@@ -56,16 +55,17 @@ public class TransactionController {
 
 	// for user
 
-	@GetMapping("/api/user/transactions")
-	@PreAuthorize("USER")
-	public ResponseEntity<PaginatedTransactionResponse> getTransactionsByAccountId(@Valid PageRequest pageRequest,
-			@AuthenticationPrincipal SecurityUser securityUser) {
+	@GetMapping("/api/user/account/{accountId}/transactions")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<PaginatedTransactionResponse> getTransactionsByAccountId(@PathVariable Long accountId,
+			@Valid PageRequest pageRequest, @AuthenticationPrincipal SecurityUser securityUser) {
+
 		if (pageRequest == null) {
 			pageRequest = new PageRequest(0, 10, null, null, null);
 		}
 
 		User currentUser = securityUser.getUser();
-		Long accountId = accountService.findAccountIdByuserId(currentUser.getId());
+		accountService.verifyAccountOwnership(accountId, currentUser.getId());
 
 		log.info("User ID = {} fetchs their transaction records with pagination: page = {}, size = {}",
 				currentUser.getId(), pageRequest.page(), pageRequest.size());
@@ -73,12 +73,12 @@ public class TransactionController {
 		return ResponseEntity.ok(transactionService.getTransactionByAccountId(accountId, pageRequest));
 	}
 
-	@GetMapping("/api/user/transactions/{id}")
-	@PreAuthorize("USER")
+	@GetMapping("/api/user/account/{accountId}/transactions/{id}")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<TransactionResponse> getTransactionByIdAndAccountId(@PathVariable Long id,
-			@AuthenticationPrincipal SecurityUser securityUser) {
+			@PathVariable Long accountId, @AuthenticationPrincipal SecurityUser securityUser) {
 		User currentUser = securityUser.getUser();
-		Long accountId = accountService.findAccountIdByuserId(currentUser.getId());
+		accountService.verifyAccountOwnership(accountId, currentUser.getId());
 
 		log.info("User Id = {} fetch transaction Id = {}", currentUser.getId(), id);
 
@@ -87,22 +87,15 @@ public class TransactionController {
 
 	// user operation
 	@PostMapping("/api/user/deposit")
-	@PreAuthorize("USER")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<TransactionResponse> deposit(@Valid @RequestBody DepositRequest request,
 			@AuthenticationPrincipal SecurityUser securityUser) {
 
 		log.info("User {} initiating deposit of {} to account {}", securityUser.getUser().getId(), request.amount(),
 				request.accountId());
 
-		// Get the user's account ID
-		Long userAccountId = accountService.findAccountIdByuserId(securityUser.getUser().getId());
-
-		// Verify the deposit account matches the user's account
-		if (!userAccountId.equals(request.accountId())) {
-			log.warn("User {} attempted to deposit to account {} but their account is {}",
-					securityUser.getUser().getId(), request.accountId(), userAccountId);
-			throw new AccessDeniedException("Cannot deposit to this account");
-		}
+		User currentUser = securityUser.getUser();
+		accountService.verifyAccountOwnership(request.accountId(), currentUser.getId());
 
 		TransactionResponse response = transactionService.deposit(request);
 
@@ -111,22 +104,15 @@ public class TransactionController {
 	}
 
 	@PostMapping("/api/user/withdraw")
-	@PreAuthorize("USER")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<TransactionResponse> withdraw(@Valid @RequestBody WithdrawRequest request,
 			@AuthenticationPrincipal SecurityUser securityUser) {
 
 		log.info("User {} initiating withdrawal of {} from account {}", securityUser.getUser().getId(),
 				request.amount(), request.accountId());
 
-		// Get the user's account ID
-		Long userAccountId = accountService.findAccountIdByuserId(securityUser.getUser().getId());
-
-		// Verify the withdrawal account matches the user's account
-		if (!userAccountId.equals(request.accountId())) {
-			log.warn("User {} attempted to withdraw from account {} but their account is {}",
-					securityUser.getUser().getId(), request.accountId(), userAccountId);
-			throw new AccessDeniedException("Cannot withdraw from this account");
-		}
+		User currentUser = securityUser.getUser();
+		accountService.verifyAccountOwnership(request.accountId(), currentUser.getId());
 
 		TransactionResponse response = transactionService.withdraw(request);
 
