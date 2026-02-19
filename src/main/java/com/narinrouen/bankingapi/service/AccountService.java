@@ -123,4 +123,9 @@ public class AccountService {
 		account.setBalance(newBalance);
 		accountRepository.save(account);
 	}
+
+	public Long findAccountIdByuserId(long id) {
+		log.info("User Id = {} fetch account Id");
+		return accountRepository.findAccountIdByUserId(id);
+	}
 }
