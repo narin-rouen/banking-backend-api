@@ -1,8 +1,5 @@
 package com.narinrouen.bankingapi.dto.request;
 
-import com.narinrouen.bankingapi.entity.Role;
-import com.narinrouen.bankingapi.entity.UserStatus;
-
 import jakarta.validation.constraints.Size;
 
 public record UpdateUserRequest(
@@ -11,8 +8,8 @@ public record UpdateUserRequest(
 
 		@Size(max = 50, message = "Last name must be at most 50 characters") String lastName,
 
-		@Size(min = 8, max = 100, message = "Email must be at most 100 characters") String password,
+		@Size(min = 8, max = 100, message = "Email must be at most 100 characters") String password
 
-		Role role, UserStatus status) {
+) {
 
 }

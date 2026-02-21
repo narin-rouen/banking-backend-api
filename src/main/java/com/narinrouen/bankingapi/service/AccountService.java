@@ -1,6 +1,7 @@
 package com.narinrouen.bankingapi.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.narinrouen.bankingapi.dto.common.PageRequest;
 import com.narinrouen.bankingapi.dto.request.CreateAccountRequest;
 import com.narinrouen.bankingapi.dto.request.UpdateAccountRequest;
+import com.narinrouen.bankingapi.dto.response.AccountDto;
 import com.narinrouen.bankingapi.dto.response.AccountResponse;
 import com.narinrouen.bankingapi.dto.response.PaginatedAccountResponse;
 import com.narinrouen.bankingapi.entity.Account;
@@ -44,7 +46,7 @@ public class AccountService {
 	}
 
 	@Transactional(readOnly = true)
-	public PaginatedAccountResponse getAccountsByUserId(long userId, PageRequest pageRequest) {
+	public PaginatedAccountResponse getAccountsByUserId(Long userId, PageRequest pageRequest) {
 		log.info("Fetching accounts for userId={} with pagination: page={}, size={}", userId, pageRequest.page(),
 				pageRequest.size());
 		Pageable pagable = pageRequest.toPageable();
@@ -137,5 +139,12 @@ public class AccountService {
 		if (account.getUser().getId() != userId) {
 			throw new AccessDeniedException("Account does not belong to user");
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccountDto> getAllAccountsByUserId(Long userId) {
+		log.info("Fetching all accounts for userId={}", userId);
+		List<Account> accounts = accountRepository.findAllByUserId(userId);
+		return accounts.stream().map(AccountDto::from).toList();
 	}
 }

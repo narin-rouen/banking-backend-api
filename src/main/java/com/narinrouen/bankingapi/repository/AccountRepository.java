@@ -1,5 +1,6 @@
 package com.narinrouen.bankingapi.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +11,9 @@ import com.narinrouen.bankingapi.entity.Account;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-	Page<Account> findByUserId(long userId, Pageable pagable);
+	Page<Account> findByUserId(Long userId, Pageable pageable);
+
+	List<Account> findAllByUserId(long userId);
 
 	Optional<Account> findByIdAndUserId(long accountId, long userId);
 
